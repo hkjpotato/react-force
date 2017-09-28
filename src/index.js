@@ -12,6 +12,7 @@ import createForceLink from './components/createForceLink';
 
 //Your presentational components
 //A node will receives props {node, selected, filtered, focused, domRef, ...injectedCallbacks}
+//Instead of writing the style inline here, you can use className with selected, filtered, focused to define the css properties as well
 class Node extends React.PureComponent {
   render() {
     const {node, domRef, selected, filtered, focused, ...eventHandlers} = this.props;
@@ -85,7 +86,7 @@ class App extends React.Component {
       nodes: [],
       links: [],
       forceOptions: {
-        gravity: 0.1,
+        gravity: .1,
         friction: 0.9,
         charge: -50,
         linkDistance: 20,
@@ -127,6 +128,7 @@ class App extends React.Component {
     }, {});
     console.log(JSON.stringify(positions, null, 2));
   }
+  
   addAtCentroid() {
     this.setState({
       nodes: [
@@ -140,6 +142,13 @@ class App extends React.Component {
         }
       ]
     });
+
+
+    // setTimeout(()=> {
+    //   this.setState({
+    //     nodes: this.state.nodes.slice(0, this.state.nodes.length - 1)
+    //   });
+    // }, 5000);
   }
   render() {
     const { 
@@ -234,5 +243,7 @@ function SelectGroup({group, onGroupChange}) {
     </div>
   )
 }
+
+
 
 ReactDOM.render(<App />, document.getElementById('root'));

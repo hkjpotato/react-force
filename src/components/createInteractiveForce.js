@@ -215,13 +215,13 @@ export default function createInteractiveForce(ForceNode, ForceLink) {
       );
     }
 
-    onForceMoveStart() {
-      this.getSelectedForceNodes()
+    onForceMoveStart(selectedForceNodes) {
+      selectedForceNodes
         .forEach(fnode=>fnode.fixed = true);
     }
 
-    onForceMoveEnd() {
-      this.getSelectedForceNodes()
+    onForceMoveEnd(selectedForceNodes) {
+      selectedForceNodes
         .forEach(fnode=>fnode.fixed &= ~6);
     }
 
@@ -235,7 +235,7 @@ export default function createInteractiveForce(ForceNode, ForceLink) {
       window.nodeDragging = false;
       this.position0 = getSvgPosition(this.ZoomBrushBase.visContainer, event);
       //get force prepared for moving nodes
-      this.onForceMoveStart();
+      this.onForceMoveStart(this.getSelectedForceNodes());
     }
 
     onNodeDrag(event) {
@@ -262,7 +262,7 @@ export default function createInteractiveForce(ForceNode, ForceLink) {
       //force behavior
       document.removeEventListener('mousemove', this.onNodeDrag, false); //native
       document.removeEventListener('mouseup', this.onNodeDragEnd, false);
-      this.onForceMoveEnd();
+      this.onForceMoveEnd(this.getSelectedForceNodes());
     }
 
     // --Key controls--
@@ -270,28 +270,28 @@ export default function createInteractiveForce(ForceNode, ForceLink) {
     /* rotate function */
     partialRotate(deg) {
       const selectedForceNodes = this.getSelectedForceNodes();
-      this.onForceMoveStart();
+      this.onForceMoveStart(selectedForceNodes);
       partialRotate(selectedForceNodes, deg);
       this.force.resume();
-      this.onForceMoveEnd();
+      this.onForceMoveEnd(selectedForceNodes);
     }
 
     /* scale function */
     partialScale(scale) {
       const selectedForceNodes = this.getSelectedForceNodes();
-      this.onForceMoveStart();
+      this.onForceMoveStart(selectedForceNodes);
       partialScale(selectedForceNodes, scale);
       this.force.resume();
-      this.onForceMoveEnd();
+      this.onForceMoveEnd(selectedForceNodes);
     }
 
     /* nudge function */
     nudge(dx, dy) {
       const selectedForceNodes = this.getSelectedForceNodes();
-      this.onForceMoveStart();
+      this.onForceMoveStart(selectedForceNodes);
       nudge(selectedForceNodes, dx, dy);
       this.force.resume();
-      this.onForceMoveEnd();
+      this.onForceMoveEnd(selectedForceNodes);
     }
 
     /* toggle fix */
@@ -346,10 +346,11 @@ export default function createInteractiveForce(ForceNode, ForceLink) {
         focusedNode, 
         focusedLink,
       } = this.state;
-
       //clean the key-instances map
       this.nodeInstances = {};
       this.linkInstances = {};
+      //https://facebook.github.io/react/docs/refs-and-the-dom.html#caveats
+      //https://github.com/facebook/react/issues/9328
 
       // build up the real React children to render(Pure! Pure! Pure!)
       // Pure means that we only extract the props related to React.PureComponent UI rendering
@@ -372,7 +373,7 @@ export default function createInteractiveForce(ForceNode, ForceLink) {
         return (
           <ForceNode
             key={nodeKey}
-            ref={n=>this.nodeInstances[nodeKey] = n}
+            ref={n => n && (this.nodeInstances[nodeKey] = n)}
             node={node}
             selected={!!selectedNodes && selectedNodes.has(nodeKey)}
             focused={!!focusedNode && nodeKey === getNodeKey(focusedNode)}
@@ -389,7 +390,7 @@ export default function createInteractiveForce(ForceNode, ForceLink) {
         return (
           <ForceLink
             key={linkKey}
-            ref={l=>this.linkInstances[linkKey] = l}
+            ref={l => l && (this.linkInstances[linkKey] = l)}
             link={link}
             focused={!!focusedLink && linkKey === getLinkKey(focusedLink)} 
             {...eventHandlers} />
@@ -401,7 +402,6 @@ export default function createInteractiveForce(ForceNode, ForceLink) {
         height,
         onBrushEnd: this.onBrushEnd,
       }
-
       return (
         <svg 
           className="kj-force__svg" 
