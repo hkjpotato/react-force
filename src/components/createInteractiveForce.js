@@ -2,11 +2,11 @@ import React, { PropTypes } from 'react';
 import forcePropTypes, { DEFAULT_FORCE_PROPS } from '../propTypes/force';
 import ZoomBrushBase from './ZoomBrushBase';
 
-//force utils
+// force utils
 import * as forceUtils from '../utils/d3-force';
 const {createForce, updateForce, getNodeKey, getLinkKey} = forceUtils;
 
-//geometry utils
+// geometry utils
 import { getSvgPosition, partialRotate, partialScale, nudge } from '../utils/geometry';
 
 
@@ -14,7 +14,6 @@ export default function createInteractiveForce(ForceNode, ForceLink) {
   return class InteractiveForce extends React.PureComponent {
     static get propTypes() {
       return {
-        // children
         nodes: PropTypes.array,
         links: PropTypes.array,
         filtered: PropTypes.object,
@@ -26,13 +25,13 @@ export default function createInteractiveForce(ForceNode, ForceLink) {
         // force layout options
         forceOptions: forcePropTypes,
 
-        //for external iteraction
+        // for external iteraction
         onNodeFocus: PropTypes.func, //change focused state
         onLinkFocus: PropTypes.func, //change focused state
         onCleanFocus: PropTypes.func, //clean the background
       
-        //For the time-being, selectedNodes/focusedNode/focusedLink is local state
-        //Later might sync props and state using similar approach https://github.com/uber/react-vis-force/blob/master/src/components/InteractiveForceGraph.js
+        // For the time-being, selectedNodes/focusedNode/focusedLink is local state
+        // Later might sync props and state using similar approach https://github.com/uber/react-vis-force/blob/master/src/components/InteractiveForceGraph.js
       };
     }
 
@@ -40,7 +39,7 @@ export default function createInteractiveForce(ForceNode, ForceLink) {
       return {
         forceOptions: DEFAULT_FORCE_PROPS,
 
-        //default empty callback props
+        // default empty callback props
         onNodeFocus() {},
         onLinkFocus() {},
         onCleanFocus() {},
@@ -50,8 +49,7 @@ export default function createInteractiveForce(ForceNode, ForceLink) {
     constructor(props) {
       super(props);
       const {nodes, links, forceOptions} = this.props;
-      //when we create the force, the force will have a map called key2nodeMap
-      //that map nodeKey to force nodes maintained by force
+      // when we create the force, the force will have a map called key2nodeMap
       this.force = createForce({
         ...DEFAULT_FORCE_PROPS,
         ...forceOptions,
@@ -59,27 +57,27 @@ export default function createInteractiveForce(ForceNode, ForceLink) {
         links
       });
 
-      //key maps to the node and link instances created by react
-      //!Important, the above maps help the force and react communicate with each other
+      // key maps to the node and link instances created by react
       this.nodeInstances = {};
       this.linkInstances = {};
+      // !Important, the above maps help the force and react communicate with each other
 
-      //of course we need to bind the tick function
+      // of course we need to bind the tick function
       this.force.on('tick', ()=>{
         this.updatePositions()
       });
 
-      //bind the private events handlers here for all the private locations related event
-      //notice we always bind the callback here because we are using PureComponent and we want to avoid uneccessary re-render
+      // bind the private events handlers here for all the private locations related event
+      // notice we always bind the callback here because we are using PureComponent and we want to avoid uneccessary re-render
       this.onNodeMouseDown = this.onNodeMouseDown.bind(this);
-      this.onNodeClick = this.onNodeClick.bind(this);
+      t = t.bind(this);
       this.onLinkClick = this.onLinkClick.bind(this);
-      this.onBrushEnd = this.onBrushEnd.bind(this); //for multiSelectable, nudge, rotate, scale, fix
-      this.onSvgKeyDown = this.onSvgKeyDown.bind(this); //for multiSelectable, nudge, rotate, scale, fix
-      this.onSvgKeyUp = this.onSvgKeyUp.bind(this); //for multiSelectable
-      this.onSvgClick = this.onSvgClick.bind(this); //for clean selected & focused
+      this.onBrushEnd = this.onBrushEnd.bind(this); // for multiSelectable, nudge, rotate, scale, fix
+      this.onSvgKeyDown = this.onSvgKeyDown.bind(this); // for multiSelectable, nudge, rotate, scale, fix
+      this.onSvgKeyUp = this.onSvgKeyUp.bind(this); // for multiSelectable
+      this.onSvgClick = this.onSvgClick.bind(this); // for clean selected & focused
       
-      //drag behavior
+      // drag behavior
       this.onNodeDragStart = this.onNodeDragStart.bind(this);
       this.onNodeDrag = this.onNodeDrag.bind(this);
       this.onNodeDragEnd = this.onNodeDragEnd.bind(this);
@@ -105,10 +103,10 @@ export default function createInteractiveForce(ForceNode, ForceLink) {
     onNodeMouseDown(event, node) {
       event.stopPropagation();
       const nodeKey = getNodeKey(node);
-      //we want to keep the logic here simple
-      //for better user experience, check http://bl.ocks.org/hkjpotato/f88e818b34827451cc1b3f19a622ad49
+      // we want to keep the logic here simple
+      // for better user experience, check http://bl.ocks.org/hkjpotato/f88e818b34827451cc1b3f19a622ad49
       if (!this.state.selectedNodes.has(nodeKey)) {
-        //if it is not selected, only select itself unless multiSelectable
+        // if it is not selected, only select itself unless multiSelectable
         if (this.state.multiSelectable) {
           this.setState({
             selectedNodes: new Set([...this.state.selectedNodes, nodeKey])
@@ -123,8 +121,8 @@ export default function createInteractiveForce(ForceNode, ForceLink) {
     }
 
     onNodeClick(event, node) {
-      event.stopPropagation(); //prevent svg click
-      if (window.nodeDragging) return; //don't do anything on nodeDragging
+      event.stopPropagation(); // prevent svg click
+      if (window.nodeDragging) return; // don't do anything on nodeDragging
       this.setState({
         focusedNode: node,
         focusedLink: null,
@@ -133,7 +131,7 @@ export default function createInteractiveForce(ForceNode, ForceLink) {
     }
 
     onLinkClick(event, link) {
-      event.stopPropagation(); //prevent svg click
+      event.stopPropagation(); // prevent svg click
       this.setState({
         focusedLink: link,
         focusedNode: null,
@@ -195,10 +193,10 @@ export default function createInteractiveForce(ForceNode, ForceLink) {
 
     onSvgClick(event) {
       const { onBgClick } = this.props;
-      //d3 zoom behavior will preventDefault
-      //click on svg also happen during brushing(but we already stop propagation in ZoomBrushBase)
+      // d3 zoom behavior will preventDefault by itself
+      // click on svg also happen during brushing(but we already stop propagation in ZoomBrushBase)
       if (!event.defaultPrevented) {
-        //TODO: sometimes a quick drag will also trigger a svg click
+        // TODO: sometimes a quick drag will also trigger a svg click
         this.setState({
           selectedNodes: new Set(),
           focusedNode: null,
@@ -231,10 +229,10 @@ export default function createInteractiveForce(ForceNode, ForceLink) {
       document.addEventListener('mousemove', this.onNodeDrag, false); //native
       document.addEventListener('mouseup', this.onNodeDragEnd, false);
       
-      //toggle flag used by onNodeClick to determine if it will be a drag on node
+      // a flag used to check if a mousedown leads to drag, maybe assign it to this?
       window.nodeDragging = false;
       this.position0 = getSvgPosition(this.ZoomBrushBase.visContainer, event);
-      //get force prepared for moving nodes
+      // get force prepared for moving nodes
       this.onForceMoveStart(this.getSelectedForceNodes());
     }
 
@@ -245,8 +243,6 @@ export default function createInteractiveForce(ForceNode, ForceLink) {
       const dx = position1.x - this.position0.x;
       const dy = position1.y - this.position0.y;
       this.position0 = position1;
-
-      //force behavior
       this.getSelectedForceNodes()
         .forEach(fnode=>{
           fnode.px += dx;
@@ -259,14 +255,12 @@ export default function createInteractiveForce(ForceNode, ForceLink) {
     onNodeDragEnd(event) {
       event.stopPropagation();
       this.position0 = null;
-      //force behavior
       document.removeEventListener('mousemove', this.onNodeDrag, false); //native
       document.removeEventListener('mouseup', this.onNodeDragEnd, false);
       this.onForceMoveEnd(this.getSelectedForceNodes());
     }
 
     // --Key controls--
-
     /* rotate function */
     partialRotate(deg) {
       const selectedForceNodes = this.getSelectedForceNodes();
@@ -312,6 +306,7 @@ export default function createInteractiveForce(ForceNode, ForceLink) {
 
     componentWillUnmount() {
       this.force.on('tick', null);
+      // Need to do more...
     }
 
     updateForce(props = this.props) {
@@ -325,7 +320,7 @@ export default function createInteractiveForce(ForceNode, ForceLink) {
       });
     }
 
-    //private method for updating location without going through React update
+    // private method for updating location without going through React
     updatePositions() {
       this.force.nodes().forEach(fnode => this.nodeInstances[getNodeKey(fnode)].updatePosition(fnode));
       this.force.links().forEach(flink => this.linkInstances[getLinkKey(flink)].updatePosition(flink));
@@ -346,14 +341,15 @@ export default function createInteractiveForce(ForceNode, ForceLink) {
         focusedNode, 
         focusedLink,
       } = this.state;
-      //clean the key-instances map
+
+      // clean the key-instances map
       this.nodeInstances = {};
       this.linkInstances = {};
-      //https://facebook.github.io/react/docs/refs-and-the-dom.html#caveats
-      //https://github.com/facebook/react/issues/9328
+      // https://facebook.github.io/react/docs/refs-and-the-dom.html#caveats
+      // https://github.com/facebook/react/issues/9328
 
       // build up the real React children to render(Pure! Pure! Pure!)
-      // Pure means that we only extract the props related to React.PureComponent UI rendering
+      // Pure means that we only extract the props related to React's data rendering
       const nodeElements = nodes.map(node=> {
         //extract the props required by React rendering
         // const {
@@ -363,13 +359,13 @@ export default function createInteractiveForce(ForceNode, ForceLink) {
         //   ...pureNodeProps, //the actual props for rendering
         // } = node;
 
-        const nodeKey = getNodeKey(node); //might save back to json?
+        const nodeKey = getNodeKey(node);
         const eventHandlers = {
           onMouseDown: this.onNodeMouseDown,
           onClick: this.onNodeClick,
         };
 
-        //just pass node instead of purNodeProps to reduce re-render due to new object 'pureNodeProps'
+        //just pass node instead of purNodeProps to reduce re-render due to new object 'pureNodeProps' created by spread operator
         return (
           <ForceNode
             key={nodeKey}

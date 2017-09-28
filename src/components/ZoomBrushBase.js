@@ -65,12 +65,12 @@ export default class ZoomBrushBase extends React.PureComponent {
       .x(xScale)
       .y(yScale)
       .on('brushstart', ()=> {
-        //d3 event always goes first!
+        // d3 event always goes first!
         // console.log('brushstart');
         this.props.onBrushStart();
       })
       .on('brush', () => {
-        //use d3 to get the extent
+        // use d3 to get the extent
         // let extent = d3.event.target.extent();
         // this.props.onBrush(extent);
       })
@@ -81,7 +81,7 @@ export default class ZoomBrushBase extends React.PureComponent {
         d3.select(this).call(d3.event.target);
       });
 
-    //active brusher and set its style(out of React Control)
+    // active brusher and set its style(out of React Control)
     let d3brush = d3.select(this.brush)
       .call(this.brusher)
 
@@ -96,7 +96,7 @@ export default class ZoomBrushBase extends React.PureComponent {
       .style('stroke', '#fff;')
       .style('shape-rendering', 'crispEdges');
 
-    //update State Based on Props
+    // update State Based on Props
     this.updateZoomBrushStatus(this.state);
   }
   updateZoomBrushStatus(state=this.state) {
@@ -107,9 +107,9 @@ export default class ZoomBrushBase extends React.PureComponent {
       d3.select(this.zoomBase).call(this.zoomer)
         .on('dblclick.zoom', null);
     } else {
-      //https://www.npmjs.com/package/react-native-listener
-      //cant't relies on d3 click because a d3 click on parent happens before a react click on child
-      //and thus stopPropagation on child's react click will not stop the parent's d3 click
+      // https://www.npmjs.com/package/react-native-listener
+      // cant't relies on d3 click because a d3 click on parent happens before a react click on child
+      // and thus stopPropagation on child's react click will not stop the parent's d3 click
       d3.select(this.zoomBase)
         // .on('click.svg_clean', ()=>{
         //   console.log('zoomBase click');
@@ -123,6 +123,7 @@ export default class ZoomBrushBase extends React.PureComponent {
     }
   }
   onZoom(d3event) {
+    // if you want better performance, you should do direct dom manipulation here
     this.setState({
       translate: d3event.translate,
       scale: d3event.scale
@@ -131,10 +132,10 @@ export default class ZoomBrushBase extends React.PureComponent {
   onKeyDown(e) {
     // console.log('zoombrush keydown', this);
     e.preventDefault();
-    //https://facebook.github.io/react/docs/react-component.html#setstate
-    //use a callback of setState to ensure the async setState is finished
-    //orginally updateZoomBrushStatus is placed in componentDidUpdate which will be
-    //called even that's just a props change, bad performance
+    // https://facebook.github.io/react/docs/react-component.html#setstate
+    // use a callback of setState to ensure the async setState is finished
+    // orginally updateZoomBrushStatus is placed in componentDidUpdate which will be
+    // called even that's just a props change, bad performance
     if(e.shiftKey) {
       this.setState({
         zoomable: false
@@ -151,12 +152,12 @@ export default class ZoomBrushBase extends React.PureComponent {
     }
   }
   onClick(e) {
-    //https://www.npmjs.com/package/react-native-listener
+    // https://www.npmjs.com/package/react-native-listener
     if (!this.state.zoomable) {
-      //during brushing, stopPropagtion to prevent parent's svg click
+      // during brushing, stopPropagtion to prevent parent's svg click
       e.stopPropagation();
     }
-    //for zoomable, we dont stopPropagation because we want to allow click on parent svg do the clean function
+    // for zoomable, we dont stopPropagation because we want to allow click on parent svg do the clean function
   }
   render() {
     const { translate, scale } = this.state;

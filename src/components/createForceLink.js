@@ -1,5 +1,5 @@
 import React from 'react';
-//HOC for force link
+// HOC for creating force link
 export default function createForceLink (WrappedComponent) {
   return class extends React.PureComponent {
     static get defaultProps() {
@@ -17,7 +17,7 @@ export default function createForceLink (WrappedComponent) {
     }
 
     updatePosition({source : {x : x1, y : y1}, target: {x: x2, y: y2}}) {
-      //findDOMNode?..not sure, the react guide is still working on it
+      // findDOMNode?..not sure, the react guide is still working on it
       this.dom.setAttribute('x1', x1);
       this.dom.setAttribute('y1', y1);
       this.dom.setAttribute('x2', x2);

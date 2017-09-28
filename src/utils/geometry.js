@@ -1,6 +1,6 @@
 import d3 from "d3";
 
-//UI related methods (used it for calculating the contour!)
+// UI related methods (used it for calculating the contour!)
 function getCentroid(fnodes) {
   let vertices = fnodes.map(d=>[d.x, d.y]);
   let getHullVertices =  d3.geom.hull(vertices);
@@ -14,7 +14,7 @@ export function partialRotate(fnodes, deg) {
     var newY = (old.x - x) * sin(r) + (old.y - y) * cos(r) + y;
     return [newX, newY];
   }
-  //get centroid of given nodes
+  // get centroid of given nodes
   let centroid = getCentroid(fnodes);
   fnodes.forEach(fnode => {
     const newPos = rotateAround(centroid, fnode, deg);
@@ -49,7 +49,7 @@ export function nudge(fnodes, dx, dy) {
 }
 
 export function getSvgPosition(container, { clientX, clientY }) {
-  //borrow from d3 source code
+  // borrow from d3 source code
   let svg = container.ownerSVGElement || container;
   let pt = svg.createSVGPoint();
   pt.x = clientX;

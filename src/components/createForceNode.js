@@ -1,6 +1,6 @@
 import React from 'react';
 
-//HOC for force Node
+// HOC for creating force Node
 export default function createForceNode (WrappedComponent) {
   return class extends React.PureComponent {
     static get defaultProps() {
@@ -20,9 +20,9 @@ export default function createForceNode (WrappedComponent) {
     }
 
     componentDidMount() {
-      //notice this is native listener, not react event
-      //because we want to fire mousedown event before the zoomstart 
-      //If we convert ZoomBrushBase into React, this problem will be solved
+      // notice this is native listener, not react event
+      // because we want to fire mousedown event before the zoomstart(d3 event),  notice React event happen after native event!
+      // If we convert ZoomBrushBase into React, this problem will be solved
       this.dom.addEventListener('mousedown', event => {
         event.stopPropagation(); //prevent zoom behavior
         this.props.onMouseDown(event, this.props.node);
@@ -34,7 +34,7 @@ export default function createForceNode (WrappedComponent) {
     }
 
     updatePosition({x, y}) {
-      //findDOMNode?..not sure, the react guide is still working on it
+      // findDOMNode?..not sure, the react guide is still working on it
       this.dom.setAttribute('transform', `translate(${x},${y})`);
     }
 
@@ -42,9 +42,7 @@ export default function createForceNode (WrappedComponent) {
       this.props.onClick(event, this.props.node);
     }
     render() {
-      //hijack the props
       const {onMouseDown, onClick, ...passThroughProps} = this.props;
-      // const {...passThroughProps} = this.props;
       const injectedProp = {
         domRef: this.domRef,
         onClick: this.onClick,

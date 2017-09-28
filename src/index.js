@@ -4,15 +4,15 @@ import d3 from 'd3';
 
 const c20 = d3.scale.category20();
 
-//use the HOC to create the container components
+// use the HOC to create the container components
 import createInteractiveForce from './components/createInteractiveForce';
 import createForceNode from './components/createForceNode';
 import createForceLink from './components/createForceLink';
 
 
-//Your presentational components
-//A node will receives props {node, selected, filtered, focused, domRef, ...injectedCallbacks}
-//Instead of writing the style inline here, you can use className with selected, filtered, focused to define the css properties as well
+// Your presentational components
+// A node will receives props {node, selected, filtered, focused, domRef, ...injectedCallbacks}
+// Instead of writing the style inline here, you can use className with selected, filtered, focused to define the css properties as well
 class Node extends React.PureComponent {
   render() {
     const {node, domRef, selected, filtered, focused, ...eventHandlers} = this.props;
@@ -54,7 +54,7 @@ class Node extends React.PureComponent {
   }
 }
 
-//A link will receives props {node, selected, filtered, domRef, ...injectedCallbacks}
+// A link will receives props {node, selected, filtered, domRef, ...injectedCallbacks}
 class Link extends React.PureComponent {
   render() {
     const {link, domRef, filtered, focused, ...spreadable} = this.props;

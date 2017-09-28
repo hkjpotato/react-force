@@ -11,7 +11,7 @@ const FORCELAYOUT_PARAMS = [
   'charge',
 ];
 
-//the props required by force nodes(nodes contains [...forceprops, uiprops])
+// the props required by force nodes(nodes contains [...forceprops, uiprops])
 const DESIRED_FORCE_NODE_PROPS = [
   'name',
   'x',
@@ -19,11 +19,8 @@ const DESIRED_FORCE_NODE_PROPS = [
   'fixed',
 ];
 
-// ---- PRIVATE METHODS ----
-
-//maybe is just a general param update
 function applySize(force, {size: [width, height]}) {
-  //only update if it is not the same as the previous value
+  // only update if it is not the same as the previous value
   if (force.size()[0] !== width || force.size()[1] !== height) {
     force.size([width, height]);
     force.shouldRun = true;
@@ -52,10 +49,10 @@ function applyForceLayoutVars(force, options) {
   
   Notice:
   1. We want to keep the previous x and y value for the same node
-  2. When the link, we assume the link from props does not have source and target reference built up
+  2. For the link, we assume the link from props only havs source and target as string (not the actual reference)
      Thus we always need to built up its reference here 
      ->When there is a new link
-     ->AND when force nodes updated(because force links always need to point to the actual force nodes)
+     ->when force nodes updated(because force links always need to point to the actual force nodes)
 */
 function applyNodesAndLinks(force, {
   links,
@@ -69,47 +66,47 @@ function applyNodesAndLinks(force, {
   let updateLinks = false;
   if (!setsEqual(forceNodesSet, reactNodesSet)) {
     force.shouldRun = true;
-    const key2nodeMap = {}; //set a new map of nodeKey to new force node
+    const key2nodeMap = {}; // set a new map of nodeKey to new force node
     const fnodes = nodes.map((node) => {
-      let fnode = {}; //a new force node object
+      let fnode = {}; // a new force node object
       const nodeKey = getNodeKey(node);
-      //update the map
+      // update the map
       key2nodeMap[nodeKey] = fnode;
-      //copy the desired node properties to the force nodes, Maybe after force nodes copy?
+      // copy the desired node properties to the force nodes, Maybe after force nodes copy?
       DESIRED_FORCE_NODE_PROPS.reduce((obj, prop)=>(
         Object.assign(obj, {[prop]: node[prop]})
       ), fnode);
-      //copy the previous force node's properties if it previously exists
-      //otherwise it will just be at a random position
+      // copy the previous force node's properties if it previously exists
+      // otherwise it will just be at a random position
       if (force.key2nodeMap && (nodeKey in force.key2nodeMap)) {
         Object.assign(fnode, force.key2nodeMap[nodeKey]);
       }
       return fnode;
     });
-    //update nodes
+    // update nodes
     force.nodes(fnodes);
-    //update key2nodeMap
+    // update key2nodeMap
     force.key2nodeMap = key2nodeMap;
-    updateLinks = true; //must update the links connection if nodes is updated
+    updateLinks = true; // must update the links connection if nodes is updated
   }
 
   const forceLinksSet = new Set(force.links().map(getLinkKey));
   const reactLinksSet = new Set(links.map(getLinkKey));
   if (!setsEqual(forceLinksSet, reactLinksSet) || updateLinks) {
     force.shouldRun = true;
-    //use the real 'node' used by the current force to ensure the connection
+    // use the real 'node' used by the current force
     const flinks = links.map(l=>({
       source: force.key2nodeMap[l.source],
       target: force.key2nodeMap[l.target],
     }));
-    //the force link is, just  {source, target}...yeah, what else should it knows?
+    // the force link is, just  {source, target}...yeah, what else should it knows?
     force.links(flinks);
   }
 }
 
-// ---- PUBLIC METHODS ----
-//KEY, like the key function of d3 data binding, use 'name' as the key
-//Modify it to use other key for your data
+
+// KEY, like the key function of d3 data binding, use 'name' as the key
+// Modify it to use other key for your data
 export function getNodeKey(node) {
   return node.name;
 }

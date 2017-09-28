@@ -10,7 +10,7 @@ export const DEFAULT_FORCE_PROPS = {
   size: [960, 600]
 };
 export default PropTypes.shape({
-  gravity: PropTypes.number, //True, maybe
+  gravity: PropTypes.number, // True, maybe
   friction: PropTypes.number,
   charge: PropTypes.number,
   linkDistance: PropTypes.number,
