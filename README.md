@@ -8,14 +8,14 @@
 
 
 ### Introduction
-After reviewing uber's [react-vis-force](https://github.com/uber/react-vis-force), Sally Wu's [3 approaches](http://bl.ocks.org/sxywu/61a4bd0cfc373cf08884) (especially approach#2) for React + D3 force and other online resources for integrating React and D3 force layout, I finally come up with this HOC component ```createInteractiveForce``` that allows you to make interactive and scalable graph vis using force layout algorithm in React.
+After reviewing uber's [react-vis-force](https://github.com/uber/react-vis-force), Sally Wu's [3 approaches](http://bl.ocks.org/sxywu/61a4bd0cfc373cf08884) (especially approach#2) for React + D3 force and other online resources for integrating React and D3 force layout, I finally come up with this HOC component ```createInteractiveForce``` that allows you to make interactive and scalable graph vis using force layout algorithm (d3 v3) in React.
 
 ### Why it is a problem?
 There are two major approaches to integrate d3 force with React:
- 1. Wrap D3 controlled UI as a component (a typical example is [here](http://nicolashery.com/integrating-d3js-visualizations-in-a-react-app/)), and then hook up React lifecycle methods with D3 update pattern.
- 2. Just regard D3 force as an additional data source injected, and let React do the rendering (including x and y), e.g. Uber's react-force-vis.
+ 1. Wrap d3 controlled UI as a component (a typical example is [here](http://nicolashery.com/integrating-d3js-visualizations-in-a-react-app/)), and then hook up React lifecycle methods with d3 update pattern.
+ 2. Just regard d3 force as an additional data source injected, and let React do the rendering (including x and y), e.g. Uber's react-force-vis.
  
-Problems with approach #1 is that: you have something live outside React's control. The UI update is controlled by D3's enter/update/exit pattern, not React. This will make state management and event control extremely hard in some cases.
+Problems with approach #1 is that: you have something live outside React's control. The UI update is controlled by d3's enter/update/exit pattern, not React. This will make state management and event control extremely hard in some cases.
 
 Problems with approach #2 are:
  1. React design pattern requires data to be __IMMUTABLE__.
@@ -26,11 +26,9 @@ Animation is one of the major challenges in React because it takes time to do th
 
 
 ### Solutions
-Basically, I don't let React do position related update. Also, I strictly separate the data into ```React``` controlled data and ```Force``` controlled data.
+Basically, I don't let React do position related update. Data source are strictly separated into structure data and position data. React controls structure data such as the ```nodes``` and ```links```, and their corresponding ```state``` related data such as ```selected```, ```focused```. Their update will go through React's reconciliation. 
 
-Data source are separated into structure data and position data. React controls structure data such as the ```nodes``` and ```links```, and their corresponding ```state``` related data such as ```selected```, ```focused```. Their update will go through React's reconciliation. 
-
-However, the position related data is controlled by D3 force. The update of position (```x``` and ```y```), triggered by ```tick``` event, will perform directly on the dom nodes through ```ref``` to achieve good performance. ( Triggering [imperative animations](https://facebook.github.io/react/docs/refs-and-the-dom.html) is one the major use cases for the ```ref``` function)
+However, the position related data is controlled by d3 force. The update of position (```x``` and ```y```), triggered by ```tick``` event, will perform directly on the dom nodes through ```ref``` to achieve good performance. ( Triggering [imperative animations](https://facebook.github.io/react/docs/refs-and-the-dom.html) is one the major use cases for the ```ref``` function)
 
 To sum up:
  - Structure data (React) and position data (Force) are strictly separated.
@@ -42,11 +40,9 @@ To sum up:
 Please check [this](http://bl.ocks.org/hkjpotato/55a25dd75d7a0e8d3d2129a8326b61ca) simplified version to get the basic idea as well.
 
 ### Challenges
-The biggest challenge is how to let Force's data and React's dom talk to each other. In d3, data is bound directly to dom node (```___data__``` property). Now our position data is not bound to the dom, how can we know the mapping between them?
+The biggest challenge is how to let Force's data and React's dom talk to each other. In d3, data is bound directly to the dom node ```___data__``` property. Now our position data is not bound to the dom, how can we know the mapping between them?
 
-The key lies in ```key```. In ```utils/d3-force.js```, we have the ```getNodeKey``` function (line#113), which will get the key value from a node data (either a force node or the react node).
-
-Meanwhile, whenever the ```render``` function is called, it will update and maintains a key to dom ref map, called ```nodeInstances``` ( line#350 ```components/createInteractiveForce```). Thus in the ```updatePositions``` ( line#329 ```components/createInteractiveForce```), it can loop through the force's data, get the corresponding key value and access the corresponding dom node in O(1).
+The key lies in ```key```. In ```utils/d3-force.js```, we have the ```getNodeKey``` function (line#113), which will get the key value from a node data (either a force node or the react node). Meanwhile, whenever the ```render``` function is called, it will update and maintains a key to dom ref map, called ```nodeInstances``` ( line#350 ```components/createInteractiveForce```). Thus in the ```updatePositions``` ( line#329 ```components/createInteractiveForce```), it can loop through the force's data, get the corresponding key value and access the corresponding dom node in O(1).
 
 Also, it will be inefficient to re-set the associated layout's nodes and re-run the force layout when receiving new nodes props. We need a quick way to determine if the new set of nodes is different from the current set controlled by force. I borrow the trick from uber's react-vis-force: compare their __key sets__. Check the ```applyNodesAndLinks``` in ```utils/d3-force``` (line#44) and the ```utils/set-equals``` extracted from uber's source code.
 
