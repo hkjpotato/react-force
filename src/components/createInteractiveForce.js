@@ -70,7 +70,7 @@ export default function createInteractiveForce(ForceNode, ForceLink) {
       // bind the private events handlers here for all the private locations related event
       // notice we always bind the callback here because we are using PureComponent and we want to avoid uneccessary re-render
       this.onNodeMouseDown = this.onNodeMouseDown.bind(this);
-      t = t.bind(this);
+      this.onNodeClick = this.onNodeClick.bind(this);
       this.onLinkClick = this.onLinkClick.bind(this);
       this.onBrushEnd = this.onBrushEnd.bind(this); // for multiSelectable, nudge, rotate, scale, fix
       this.onSvgKeyDown = this.onSvgKeyDown.bind(this); // for multiSelectable, nudge, rotate, scale, fix
