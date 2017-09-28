@@ -15,9 +15,9 @@ There are two major approaches to integrate d3 force with React:
  1. Wrap D3 controlled UI as a component (a typical example is [here](http://nicolashery.com/integrating-d3js-visualizations-in-a-react-app/)), and then hook up React lifecycle methods with D3 update pattern.
  2. Just regard D3 force as an additional data source injected, and let React do the rendering (including x and y), e.g. Uber's react-force-vis.
  
-Problems with approach #1 are that: you have something live outside React's control. The UI update is controlled by D3's enter/update/exit pattern, not React. This will make state management and event control extremely hard in some cases.
+Problems with approach #1 is that: you have something live outside React's control. The UI update is controlled by D3's enter/update/exit pattern, not React. This will make state management and event control extremely hard in some cases.
 
-Problems with approach #2 are that:
+Problems with approach #2 are:
  1. React design pattern requires data to be __IMMUTABLE__.
  2. D3 force will __MUTATE__ the data assigned to it, breaking the immutable rules.
  3. React is __SLOW__ in terms of animation, let's admit it. 
