@@ -10,17 +10,6 @@
 ### Introduction
 After reviewing uber's [react-vis-force](https://github.com/uber/react-vis-force), Sally Wu's [3 approaches](http://bl.ocks.org/sxywu/61a4bd0cfc373cf08884) (especially approach#2) for React + D3 force and other online resources for integrating React and D3 force layout, I finally come up with this HOC component ```createInteractiveForce``` that allows you to make interactive and scalable graph vis using force layout algorithm in React.
 
-### How to use
-This is a demo version, clone it and runs ```npm install```, then run ```npm run start```. You can see an example on ```localhost:3000```.
-
-Check the ```index.js``` in the ```src``` file to get an idea of how to create your own force graph. You have 3 HOCs to help you ```createForceNode```, ```createForceLink```, and ```createInteractiveForce```.
-
-Your presentational components ```Node``` and ```Link``` will receive certain props. You need to set ```ref={domRef}``` to your dom element so that its position can be updated.
-
-Currently, I assume the ```nodes``` all have a ```name``` attribute as the key. Each link has ```source``` and ```target``` attributes, which are the ```name```of the related node. You can modified the ```getNodeKey``` and ```getLinkKey``` function in ```utils/d3-force```.
-
-Key events: ```shift``` triggers brushing, ```meta``` triggers multi-selection, ```"(",")"``` for rotation, ```"-","+"``` for scaling, ```"d", "f"``` for toggling fixed.
-
 ### Why it is a problem?
 There are two major approaches to integrate d3 force with React:
  1. Wrap D3 controlled UI as a component (a typical example is [here](http://nicolashery.com/integrating-d3js-visualizations-in-a-react-app/)), and then hook up React lifecycle methods with D3 update pattern.
@@ -61,6 +50,17 @@ Meanwhile, whenever the ```render``` function is called, it will update and main
 
 Also, it will be inefficient to re-set the associated layout's nodes and re-run the force layout when receiving new nodes props. We need a quick way to determine if the new set of nodes is different from the current set controlled by force. I borrow the trick from uber's react-vis-force: compare their __key sets__. Check the ```applyNodesAndLinks``` in ```utils/d3-force``` (line#44) and the ```utils/set-equals``` extracted from uber's source code.
 
+
+### How to use
+This is a demo version, clone it and runs ```npm install```, then run ```npm run start```. You can see an example on ```localhost:3000```.
+
+Check the ```index.js``` in the ```src``` file to get an idea of how to create your own force graph. You have 3 HOCs to help you ```createForceNode```, ```createForceLink```, and ```createInteractiveForce```.
+
+Your presentational components ```Node``` and ```Link``` will receive certain props. You need to set ```ref={domRef}``` to your dom element so that its position can be updated.
+
+Currently, I assume the ```nodes``` all have a ```name``` attribute as the key. Each link has ```source``` and ```target``` attributes, which are the ```name```of the related node. You can modified the ```getNodeKey``` and ```getLinkKey``` function in ```utils/d3-force```.
+
+Key events: ```shift``` triggers brushing, ```meta``` triggers multi-selection, ```"(",")"``` for rotation, ```"-","+"``` for scaling, ```"d", "f"``` for toggling fixed.
 
 ### In Addition
  1. the ```ZoomBrushBase``` layer use d3 zoom and brushing. Thus ```zoom```and ```brush``` event is outside React's event system, need to be careful about it. Also, my drag behavior is implemented in an ungly way.
