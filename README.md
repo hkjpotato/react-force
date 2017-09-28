@@ -44,7 +44,7 @@ The biggest challenge is how to let Force's data and React's dom talk to each ot
 
 The key lies in ```key```. In ```utils/d3-force.js```, we have the ```getNodeKey``` function (line#113), which will get the key value from a node data (either a force node or the react node). Meanwhile, whenever the ```render``` function is called, it will update and maintains a key to dom ref map, called ```nodeInstances``` ( line#350 ```components/createInteractiveForce```). Thus in the ```updatePositions``` ( line#329 ```components/createInteractiveForce```), it can loop through the force's data, get the corresponding key value and access the corresponding dom node in O(1).
 
-Also, it will be inefficient to re-set the associated layout's nodes and re-run the force layout when receiving new nodes props. We need a quick way to determine if the new set of nodes is different from the current set controlled by force. I borrow the trick from uber's react-vis-force: compare their __key sets__. Check the ```applyNodesAndLinks``` in ```utils/d3-force``` (line#44) and the ```utils/set-equals``` extracted from uber's source code.
+Also, it will be inefficient to re-set the associated layout's nodes and re-run the force layout each time when receiving new nodes props. We need a quick way to determine if the new set of nodes is different from the current set controlled by force. I borrow the trick from uber's react-vis-force: compare their __key sets__. Check the ```applyNodesAndLinks``` in ```utils/d3-force``` (line#44) and the ```utils/set-equals``` extracted from uber's source code.
 
 
 ### How to use
