@@ -15,7 +15,7 @@ module.exports = {
     // bundle the client for hot reloading
     // only- means to only hot reload for successful updates
 
-    './src/index.js',
+    './src/example.js',
     // the entry point of our app
   ],
   output: {
